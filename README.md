@@ -1,6 +1,6 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/Ki47e6IN)
 
-##TODO:
+## TODO:
 
 ### Gesture Recognition
 Recognize gestures based on DIPPID-data
@@ -23,4 +23,12 @@ Alternative approach (maybe better?): (SVM), LSTM
 - chose image (folder)
 - send image(s) to desktop (TCP)
 - (take picture)
+
+---
+
+Tilt Paper weil wegen:
+- no additional hardware
+- not too easy
+- decided to implement the image viewer part because it can be extended for example for PowerPoint, image viewer makes sense with data transfer, possibility to implement in pyglet
+- TODO: links other potential paper we had a look at
   
