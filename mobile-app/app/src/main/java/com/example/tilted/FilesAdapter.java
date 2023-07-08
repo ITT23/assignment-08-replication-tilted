@@ -20,10 +20,14 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
 
     Context context;
     ArrayList<File> filesAndFolders;
+    static Sender androidWebServer;
 
     public FilesAdapter(Context context, ArrayList<File> filesAndFolders) {
         this.context = context;
         this.filesAndFolders = filesAndFolders;
+        if (androidWebServer == null) {
+            androidWebServer = new Sender(context);
+        }
     }
 
     @NonNull
@@ -33,6 +37,8 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
         return new ViewHolder(view);
     }
 
+    // todo: on back press -> set current file new (???)
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         File selectedFile = filesAndFolders.get(position);
@@ -41,6 +47,7 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                androidWebServer.setCurrentFile(selectedFile);
                 if (selectedFile.isDirectory()) {
                     Intent intent = new Intent(context, FilesActivity.class);
                     String path = selectedFile.getAbsolutePath();

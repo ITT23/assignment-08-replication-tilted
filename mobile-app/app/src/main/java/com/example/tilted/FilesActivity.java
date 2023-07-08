@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ public class FilesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_files);
-
         RecyclerView recycler = findViewById(R.id.recycler_view);
 
         File root = new File(getIntent().getStringExtra("path"));
@@ -29,13 +29,13 @@ public class FilesActivity extends AppCompatActivity {
                     imagesAndFolders.add(file);
                 }
             }
-
             recycler.setLayoutManager(new LinearLayoutManager(this));
             recycler.setAdapter(new FilesAdapter(getApplicationContext(), imagesAndFolders));
         }
     }
 
     private boolean isImage(File file) {
+        if (file.getName().contains(".trashed")) return false;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);

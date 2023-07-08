@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Environment;
+import android.os.Parcelable;
 import android.text.format.Formatter;
 import android.view.View;
 
@@ -46,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(checkPermission()) {
-                    startWebServer();
                     Intent intent = new Intent(MainActivity.this, FilesActivity.class);
                     String path = Environment.getExternalStorageDirectory().getPath();
                     intent.putExtra("path", path);
@@ -64,18 +64,6 @@ public class MainActivity extends AppCompatActivity {
         ipTextView.setText(ip);
     }
 
-    private boolean startWebServer() {
-        try {
-            Sender androidWebServer = new Sender();
-            androidWebServer.start();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(MainActivity.this, "Webserver could ned be started.", Toast.LENGTH_SHORT).show();
-        }
-        return false;
-    }
-
     private boolean checkPermission() {
         return ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
         ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
@@ -90,17 +78,17 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 111);
 
         if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.INTERNET)) {
-            Toast.makeText(MainActivity.this, "Please allow write storage permission.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Please allow internet permission.", Toast.LENGTH_SHORT).show();
         }
         ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.INTERNET}, 111);
 
         if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_WIFI_STATE)) {
-            Toast.makeText(MainActivity.this, "Please allow write storage permission.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Please allow access wifi state permission.", Toast.LENGTH_SHORT).show();
         }
         ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.ACCESS_WIFI_STATE}, 111);
 
         if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_NETWORK_STATE)) {
-            Toast.makeText(MainActivity.this, "Please allow write storage permission.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Please allow access network state permission.", Toast.LENGTH_SHORT).show();
         }
         ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.ACCESS_NETWORK_STATE}, 111);
         //ActivityCompat.requestPermissions(MainActivity.this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 111);
