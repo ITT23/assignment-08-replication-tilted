@@ -149,8 +149,8 @@ if __name__ == "__main__":
   parser = ArgumentParser(prog="Data Gatherer", description="this application gatheres gesture data from a M5Stack or an Android smartphone. data contains these values: id, gesture, acceleration(x,y,z) and timestamp. data will be saved to a csv file.")
   parser.add_argument("gesture", type=str, choices=list(Gesture.__members__), help=f"provide a gesture that you want to measure. gestures are: {list(Gesture.__members__)}.")
 
-  parser.add_argument("-d", "--duration", default=4, type=check_positive_int, help="[default: 10, unit: seconds] provide a duration in seconds that you want to measure your activity. the application automatically stops the recording and creates a csv file.")
-  parser.add_argument("-pps", "--pollspersecond", default=30, type=check_positive_int, help="[default: 50, unit: per second] determine the frequency that the DIPPID device is polled for sensor data.")
+  parser.add_argument("-d", "--duration", default=3, type=check_positive_int, help="[default: 10, unit: seconds] provide a duration in seconds that you want to measure your activity. the application automatically stops the recording and creates a csv file.")
+  parser.add_argument("-pps", "--pollspersecond", default=50, type=check_positive_int, help="[default: 50, unit: per second] determine the frequency that the DIPPID device is polled for sensor data.")
   parser.add_argument("-w", "--wait", default=3, type=check_positive_int, help="[default: 5, unit: seconds] when pressing button_1 to start recording, the application waits X second so that the user can put the device inside his pocket and get ready for the activity.")
   parser.add_argument("-f", "--file_location", default="data", type=str, help="[default: ./data] folder location where to save files.")
 
