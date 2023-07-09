@@ -1,9 +1,9 @@
 package com.example.tilted;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Environment;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -21,26 +23,23 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
 
     Context context;
     ArrayList<File> filesAndFolders;
-    String ip;
-    static Sender androidWebServer;
+    ExplorerFragment fragment;
+    MainActivity mainActivity;
 
-    public FilesAdapter(Context context, ArrayList<File> filesAndFolders, String ip) {
-        this.context = context;
-        this.filesAndFolders = filesAndFolders;
-        if (androidWebServer == null) {
-            androidWebServer = new Sender(context);
-        }
-        this.ip = ip;
+    public FilesAdapter(ExplorerFragment fragment) {
+        this.fragment = fragment;
+        this.context = fragment.getActivity();
+        mainActivity = (MainActivity) fragment.getActivity();
+        setFiles(fragment.getPath());
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.recycler_item, parent, false);
+
         return new ViewHolder(view);
     }
-
-    // todo: on back press -> set current file new (???)
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -50,24 +49,21 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                androidWebServer.setCurrentFile(selectedFile);
-                Intent intent;
+                fragment.getSender().setCurrentFile(selectedFile);
                 try {
                     if (selectedFile.isDirectory()) {
-                        intent = new Intent(context, FilesActivity.class);
-                    } else {
-                        /*Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.parse(selectedFile.getAbsolutePath()), "image/*");
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(intent);*/
-                        intent = new Intent(context, ImageViewerActivity.class);
+                        fragment.setPath(selectedFile.getAbsolutePath());
+                        Log.e("PATH", fragment.getPath());
+                        setFiles(fragment.getPath());
+                    } else if (selectedFile.isFile()){
+                        mainActivity.setChosenFile(selectedFile);
+                        mainActivity.getSender().setCurrentFile(selectedFile);
+                        FragmentManager fragmentManager = fragment.getActivity().getSupportFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.fragment_container, new ImageViewerFragment());
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
                     }
-                String path = selectedFile.getAbsolutePath();
-                intent.putExtra("path", path);
-                intent.putExtra("ip", ip);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
                 } catch (Exception e) {
                     Toast.makeText(context.getApplicationContext(), "Cannot open file. No image file.", Toast.LENGTH_SHORT).show();
                 }
@@ -79,6 +75,30 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
     public int getItemCount() {
         return filesAndFolders.size();
     }
+
+    public void setFiles(String path) {
+        File root = new File(path);
+        File[] filesAndFolders = root.listFiles();
+        ArrayList<File> imagesAndFolders = new ArrayList<>();
+        if (filesAndFolders != null) {
+            for (File file : filesAndFolders) {
+                if (file.isDirectory() || isImage(file)) {
+                    imagesAndFolders.add(file);
+                }
+            }
+        }
+        this.filesAndFolders = imagesAndFolders;
+        notifyDataSetChanged();
+    }
+
+    private boolean isImage(File file) {
+        if (file.getName().contains(".trashed")) return false;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        return options.outWidth != -1 && options.outHeight != -1;
+    }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 

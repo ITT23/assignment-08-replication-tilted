@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -11,7 +12,6 @@ import androidx.annotation.RequiresApi;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Base64;
 import fi.iki.elonen.NanoHTTPD;
 
@@ -64,6 +64,11 @@ public class Sender extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Log.e("FILENAME", currentFile.getName());
+            Log.e("FILEPATH", currentFile.getPath());
+            Log.e("ISFILE", currentFile.exists()+"");
+            Log.e("ISIMG", isImage(currentFile)+"");
+
             // only allow throwing if current file is image (not directory)
             /** if (currentFile.isDirectory()) {
                 File[] listFiles = currentFile.listFiles();
@@ -77,8 +82,9 @@ public class Sender extends NanoHTTPD {
                     }
                 }
                 return new Response(Arrays.toString(bufferedFiles));
-            } else **/ if (currentFile.isFile() && isImage(currentFile)) {
+            } else **/ if (currentFile.exists() && isImage(currentFile)) {
                 String filename = currentFile.getName();
+                Log.e("FILENAME", filename);
                 String filedata = encodeFile(currentFile);
                 String msg = String.format("{\"filename\" : \"%s\", \"data\" : \"%s\"}", filename, filedata);
                 return new Response(msg);
