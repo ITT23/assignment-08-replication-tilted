@@ -26,8 +26,9 @@ class Recogniser:
   def predict(self, data: NDArray) -> Gesture:
     points = self._scaler.fit_transform(data)
     points_resampled = resample(points, self.SAMPLE_POINTS)
-    prediction = self._model.predict(points_resampled)
-    y_predictions = np.argmax(prediction, axis=1)
+    n_array = np.array([points_resampled])
+    prediction = self._model.predict(n_array, verbose=0)
+    y_predictions = np.argmax(prediction)
 
     prediction_label = self._encoder.inverse_transform(np.array([y_predictions]))[0]
 
@@ -35,4 +36,4 @@ class Recogniser:
 
 if __name__ == "__main__":
   recogniser = Recogniser()
-  recogniser.run()
+  recogniser.predict()
