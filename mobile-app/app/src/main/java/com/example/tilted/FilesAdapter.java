@@ -3,6 +3,7 @@ package com.example.tilted;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +21,16 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
 
     Context context;
     ArrayList<File> filesAndFolders;
+    String ip;
     static Sender androidWebServer;
 
-    public FilesAdapter(Context context, ArrayList<File> filesAndFolders) {
+    public FilesAdapter(Context context, ArrayList<File> filesAndFolders, String ip) {
         this.context = context;
         this.filesAndFolders = filesAndFolders;
         if (androidWebServer == null) {
             androidWebServer = new Sender(context);
         }
+        this.ip = ip;
     }
 
     @NonNull
@@ -48,22 +51,25 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
             @Override
             public void onClick(View view) {
                 androidWebServer.setCurrentFile(selectedFile);
-                if (selectedFile.isDirectory()) {
-                    Intent intent = new Intent(context, FilesActivity.class);
-                    String path = selectedFile.getAbsolutePath();
-                    intent.putExtra("path", path);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                } else {
-                    try {
-                        Intent intent = new Intent();
+                Intent intent;
+                try {
+                    if (selectedFile.isDirectory()) {
+                        intent = new Intent(context, FilesActivity.class);
+                    } else {
+                        /*Intent intent = new Intent();
                         intent.setAction(Intent.ACTION_VIEW);
                         intent.setDataAndType(Uri.parse(selectedFile.getAbsolutePath()), "image/*");
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(intent);
-                    } catch (Exception e) {
-                        Toast.makeText(context.getApplicationContext(), "Cannot open file. No image file.", Toast.LENGTH_SHORT).show();
+                        context.startActivity(intent);*/
+                        intent = new Intent(context, ImageViewerActivity.class);
                     }
+                String path = selectedFile.getAbsolutePath();
+                intent.putExtra("path", path);
+                intent.putExtra("ip", ip);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(context.getApplicationContext(), "Cannot open file. No image file.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -4,9 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -20,6 +24,10 @@ public class FilesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_files);
         RecyclerView recycler = findViewById(R.id.recycler_view);
 
+        String ip = getIntent().getStringExtra("ip");
+        TextView ipTextView = findViewById(R.id.textview_ip);
+        ipTextView.setText(ip);
+
         File root = new File(getIntent().getStringExtra("path"));
         File[] filesAndFolders = root.listFiles();
         if (filesAndFolders != null) {
@@ -30,7 +38,7 @@ public class FilesActivity extends AppCompatActivity {
                 }
             }
             recycler.setLayoutManager(new LinearLayoutManager(this));
-            recycler.setAdapter(new FilesAdapter(getApplicationContext(), imagesAndFolders));
+            recycler.setAdapter(new FilesAdapter(getApplicationContext(), imagesAndFolders, ip));
         }
     }
 

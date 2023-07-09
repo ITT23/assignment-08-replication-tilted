@@ -78,7 +78,10 @@ public class Sender extends NanoHTTPD {
                 }
                 return new Response(Arrays.toString(bufferedFiles));
             } else **/ if (currentFile.isFile() && isImage(currentFile)) {
-                return new Response(encodeFile(currentFile));
+                String filename = currentFile.getName();
+                String filedata = encodeFile(currentFile);
+                String msg = String.format("{\"filename\" : \"%s\", \"data\" : \"%s\"}", filename, filedata);
+                return new Response(msg);
             }
         }
         return new Response("");

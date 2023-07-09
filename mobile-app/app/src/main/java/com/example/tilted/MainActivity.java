@@ -42,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        TextView ipTextView = findViewById(R.id.textview_ip);
+        Context context = getApplicationContext();
+        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+        ipTextView.setText(ip);
+
         MaterialButton openStorageBtn = findViewById(R.id.open_storage_btn);
         openStorageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,18 +56,13 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, FilesActivity.class);
                     String path = Environment.getExternalStorageDirectory().getPath();
                     intent.putExtra("path", path);
+                    intent.putExtra("ip", ip);
                     startActivity(intent);
                 } else {
                     requestPermission();
                 }
             }
         });
-
-        TextView ipTextView = findViewById(R.id.textview_ip);
-        Context context = getApplicationContext();
-        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        ipTextView.setText(ip);
     }
 
     private boolean checkPermission() {
