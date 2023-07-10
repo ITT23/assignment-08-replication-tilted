@@ -17,7 +17,6 @@ window = pyglet.window.Window(width=WINDOW_WIDTH, height=WINDOW_HEIGHT)
 image = pyglet.image.load('nothing.png')
 sprite = pyglet.sprite.Sprite(image, x=50, y=50)
 
-# TODO: send filename too
 
 def receive_data():
     r = requests.get(url = f'http://{phone_ip}:8080/')
