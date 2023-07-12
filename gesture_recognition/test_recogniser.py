@@ -10,7 +10,7 @@ from DIPPID import SensorUDP
 
 class Input:
 
-  def __init__(self, port: int, capabilities: list[str]) -> None:
+  def __init__(self, port, capabilities) -> None:
     self._port = port
     self._sensor = SensorUDP(self._port)
     
