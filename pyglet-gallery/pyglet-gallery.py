@@ -4,13 +4,14 @@ from pyglet import clock
 from Gallery import Gallery
 import sys
 import time
-#import requests
+import requests
 import base64
 from threading import Thread
 from DIPPID import SensorUDP
 #sys.path.append("../gesture_recognition/")
 from recogniser import Recogniser
 from collections import deque
+from gestures import Gesture
 import numpy as np
 import statistics
 
@@ -27,7 +28,7 @@ WINDOW_HEIGHT = 800
 
 img_folder = os.path.join(os.path.dirname(__file__), "img")
 
-phone_ip = '192.168.0.72'
+phone_ip = '192.168.2.116'
 
 if len(sys.argv) > 1:
     phone_ip = sys.argv[1]
@@ -38,22 +39,27 @@ window = pyglet.window.Window(1080, 720)
 
 gallery = Gallery()
 #keyboard = Controller()
-
+received_img = None
 
 def receive_data():
-    r = requests.get(url = f'http://{phone_ip}:8080/')
-    result = r.json()
-    filename = result['filename']
-    filedata = result['data']
-    with open(os.path.normpath(os.path.join(img_folder, filename)), "wb") as fh:
-        fh.write(base64.b64decode(filedata))
-    image = pyglet.image.load(filename)
+    global received_img
+    try:
+        r = requests.get(url = f'http://{phone_ip}:8080/')
+        result = r.json()
+        filename = result['filename']
+        filedata = result['data']
+        with open(os.path.normpath(os.path.join(img_folder, filename)), "wb") as fh:
+            fh.write(base64.b64decode(filedata))
+        received_image = pyglet.image.load(filename)
+    except:
+        pass
+
     
 
 def transform_data(data: dict) -> tuple:
-    x = data["accelerometer"]["x"]
-    y = data["accelerometer"]["y"]
-    z = data["accelerometer"]["z"]
+    x = data["x"]
+    y = data["y"]
+    z = data["z"]
 
     return [x,y,z]
 
@@ -64,18 +70,22 @@ def on_draw():
     mode_counter += 1
     window.clear()
     data = sensor.get_value("accelerometer")
-    deque_list.append(transform_data(data))
+    if data:
+        deque_list.append(transform_data(data))
       
     if len(deque_list) == 50:
         result = recognizer.predict(list(deque_list))
         recent_predictions.append(result)
-    if mode_counter == 60:
-        mode = statistics.mode(recent_predictions)
-        apply_input(mode)
+        #apply_input(result)
+    if mode_counter == 20:
+        print(recent_predictions)
+        if recent_predictions and len(recent_predictions) > 0:
+            mode = statistics.mode(recent_predictions)
+            apply_input(mode)
         mode_counter = 0
 
-        
     gallery.draw()
+
 
 
 def update(dt):
@@ -110,12 +120,23 @@ def on_key_press(symbol, modifiers):
 # for predicted gestures
 
 def apply_input(input_condition):
-    if input_condition == 0: # tilt left
+    print(input_condition)
+    shift = 500
+    for image in gallery.images:
+        if image.scale >= 0.55:
+            shift = image.width
+    print(shift)
+
+    if input_condition == Gesture.TILT_RIGHT: # tilt left
         print("tilt left")
-    elif input_condition == 1: # tilt right
+        #if gallery.images[0].x < 0:
+        gallery.move_sprites(-(shift + 100))
+    elif input_condition == Gesture.TILT_LEFT: # tilt right
         print("tilt right")
-    elif input_condition == 2: # throw
-        receive_data()
+        #f gallery.images[-1].x > 500:
+        gallery.move_sprites(shift + 100)
+    elif input_condition == Gesture.THROW: # throw
+        print(receive_data())
         #append_picture()
         print("throw")
     elif input_condition == 3: # neutral
