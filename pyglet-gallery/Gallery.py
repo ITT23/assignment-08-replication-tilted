@@ -58,3 +58,5 @@ class Gallery:
     def move_sprites(self, x_offset):
         for image in self.images:
             image.x_offset = -x_offset
+    
+    
