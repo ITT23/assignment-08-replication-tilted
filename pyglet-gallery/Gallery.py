@@ -100,12 +100,12 @@ class Gallery:
         return movement_active, moving_direction
 
     def on_tilt_left(self):
-        if (not self.moving_right_active) and self.current_img_index < len(self.images) - 1:
+        if (not self.moving_right_active and not self.moving_left_active) and self.current_img_index < len(self.images) - 1:
             self.current_img_index += 1
             self.moving_left_active = True
 
     def on_tilt_right(self):
-        if (not self.moving_left_active) and self.current_img_index > 0:
+        if (not self.moving_left_active and not self.moving_right_active) and self.current_img_index > 0:
             self.current_img_index -= 1
             self.moving_right_active = True
     
@@ -113,8 +113,25 @@ class Gallery:
         img = pyglet.image.load(path)
         img.anchor_x = img.width // 2
         img.anchor_y = img.height // 2
-        sprite = pyglet.sprite.Sprite(img=img, x=0, y=0)
+
+        sprite = pyglet.sprite.Sprite(img, x=self.window_w/2, y=self.window_h/2)
+        scaling_factor = self.get_scale_factor(img.width, img.height)
+        sprite.scale = scaling_factor
+        sprite.opacity = self.min_opacity
+        #scaled_img_width = scaling_factor * img.width
+        #sprite.x = (i + 1) * (scaled_img_width + 25)
+        #sprite = pyglet.sprite.Sprite(img=img, x=0, y=0)
+        scaled_img_width = scaling_factor * img.width
+        #sprite.x = (i + 1) * (scaled_img_width + 25)
+        for i, image in enumerate(self.images):
+            if i < self.current_img_index:
+                image.x -= (scaled_img_width + 25)
+            else:
+                image.x += (scaled_img_width + 25)
+            image.opacity = self.min_opacity
         self.images.insert(self.current_img_index, sprite)
+        self.images[self.current_img_index].opacity = self.max_opacity
+
 
     def get_scale_factor(self, sprite_width, sprite_height):
         x_scale = self.max_img_width / sprite_width
