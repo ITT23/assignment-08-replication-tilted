@@ -3,7 +3,7 @@ import random
 import pyglet
 import math
 
-
+'''
 #AnimatedSprite class with help of chatGpt
 class AnimatedSprite(pyglet.sprite.Sprite):
     def __init__(self, *args, **kwargs):
@@ -12,6 +12,7 @@ class AnimatedSprite(pyglet.sprite.Sprite):
         self.total_x_offset = 0
         self.target_scale = self.scale
         self.scale_speed = 0.1
+
 
     def update(self, dt):
         self.x += self.x_offset * dt 
@@ -30,33 +31,93 @@ class AnimatedSprite(pyglet.sprite.Sprite):
             if self.target_scale < self.scale:
                 scale_change = self.scale_speed * dt * -1
                 self.scale += scale_change
+'''
 
 class Gallery:
-    def __init__(self):
-        self.sprite_corners = []
+    def __init__(self, window_w, window_h):
+        self.window_w = window_w
+        self.window_h = window_h
         self.images = []
-
-        x_pos = -300
-        y_pos = 200 
-        spacing = 100
+        self.current_img_index = 0
+        self.moving_left_active = False
+        self.moving_right_active = False
+        self.min_opacity = 64
+        self.max_opacity = 255
+        self.max_img_width = window_w // 3
 
         img_folder = os.path.join(os.path.dirname(__file__), "img")
         img_files = os.listdir(img_folder)
 
-        for filename in img_files:
+        for i, filename in enumerate(img_files):
             img_path = os.path.normpath(os.path.join(img_folder, filename))
-            img_path = os.path.normpath(os.path.join(img_folder, filename))
-            sprite = AnimatedSprite(img=pyglet.image.load(img_path), x=x_pos, y=y_pos)
-            sprite.scale = 0.5
+            img = pyglet.image.load(img_path)
+            img.anchor_x = img.width // 2
+            img.anchor_y = img.height // 2
+            sprite = pyglet.sprite.Sprite(img, x=window_w/2, y=window_h/2)
+            scaling_factor = self.get_scale_factor(img.width, img.height)
+            sprite.scale = scaling_factor
+            sprite.opacity = self.min_opacity
+            scaled_img_width = scaling_factor * img.width
+            sprite.x = (i + 1) * (scaled_img_width + 25)
             self.images.append(sprite)
-            x_pos += sprite.width + spacing
+        self.images[self.current_img_index].opacity = self.max_opacity
 
     def draw(self):
-        for image in self.images:
+        movement_active, moving_direction = self.update_movement()
+        for i, image in enumerate(self.images):
+            if movement_active:
+                image.x += moving_direction * 5
             image.draw()
 
-    def move_sprites(self, x_offset):
-        for image in self.images:
-            image.x_offset = -x_offset
+    def update_movement(self):
+        movement_active = False
+        moving_direction = 0
+        # if left tilted move images to the left
+        if self.moving_left_active:
+            moving_direction = -1
+            # update opacity for de-highlighting old target img
+            if self.images[self.current_img_index-1].opacity >= self.min_opacity:
+                self.images[self.current_img_index-1].opacity -= 2
+        # if right tilted move images to the right
+        elif self.moving_right_active:
+            moving_direction = 1
+            # update opacity for de-highlighting old target img
+            if self.images[self.current_img_index+1].opacity >= self.min_opacity:
+                self.images[self.current_img_index+1].opacity -= 2
+
+        # if images are currently moving, check if target img is in center
+        # if so: stop movement, if not: update opacity to highlight new target img
+        if moving_direction != 0:
+            if self.window_w / 2 - 5 < self.images[self.current_img_index].x < self.window_w / 2 + 5:
+                movement_active = False
+                self.moving_right_active = False
+                self.moving_left_active = False
+                self.images[self.current_img_index].opacity = self.max_opacity
+            else:
+                movement_active = True
+                if self.images[self.current_img_index].opacity < self.max_opacity - 1:
+                    self.images[self.current_img_index].opacity += 2
+        return movement_active, moving_direction
+
+    def on_tilt_left(self):
+        if (not self.moving_right_active) and self.current_img_index < len(self.images) - 1:
+            self.current_img_index += 1
+            self.moving_left_active = True
+
+    def on_tilt_right(self):
+        if (not self.moving_left_active) and self.current_img_index > 0:
+            self.current_img_index -= 1
+            self.moving_right_active = True
     
-    
+    def add_image(self, path):
+        img = pyglet.image.load(path)
+        img.anchor_x = img.width // 2
+        img.anchor_y = img.height // 2
+        sprite = pyglet.sprite.Sprite(img=img, x=0, y=0)
+        self.images.insert(self.current_img_index, sprite)
+
+    def get_scale_factor(self, sprite_width, sprite_height):
+        x_scale = self.max_img_width / sprite_width
+        # y_scale = self.window_h / sprite_height
+        return x_scale
+

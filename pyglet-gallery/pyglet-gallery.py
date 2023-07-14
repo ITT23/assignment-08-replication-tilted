@@ -15,7 +15,7 @@ from gestures import Gesture
 import numpy as np
 import statistics
 
-recognizer = Recogniser()
+#recognizer = Recogniser()
 deque_list = deque([], maxlen=50)
 port = 5700
 sensor = SensorUDP(port)
@@ -23,8 +23,8 @@ sensor = SensorUDP(port)
 recent_predictions = deque([], maxlen=15)
 mode_counter = 0
 
-WINDOW_WIDTH = 500
-WINDOW_HEIGHT = 800
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 500
 
 img_folder = os.path.join(os.path.dirname(__file__), "img")
 
@@ -34,10 +34,10 @@ if len(sys.argv) > 1:
     phone_ip = sys.argv[1]
 #from pynput.keyboard import Key, Controller
 
-window = pyglet.window.Window(1080, 720)
+window = pyglet.window.Window(WINDOW_WIDTH, WINDOW_HEIGHT)
 
 
-gallery = Gallery()
+gallery = Gallery(WINDOW_WIDTH, WINDOW_HEIGHT)
 #keyboard = Controller()
 received_img = None
 
@@ -50,7 +50,7 @@ def receive_data():
         filedata = result['data']
         with open(os.path.normpath(os.path.join(img_folder, filename)), "wb") as fh:
             fh.write(base64.b64decode(filedata))
-        received_image = pyglet.image.load(filename)
+        gallery.add_image(os.path.normpath(os.path.join(img_folder, filename)))
     except:
         pass
 
@@ -74,8 +74,9 @@ def on_draw():
         deque_list.append(transform_data(data))
       
     if len(deque_list) == 50:
-        result = recognizer.predict(list(deque_list))
-        recent_predictions.append(result)
+        pass
+        #result = recognizer.predict(list(deque_list))
+        #recent_predictions.append(result)
         #apply_input(result)
     if mode_counter == 20:
         print(recent_predictions)
@@ -93,14 +94,6 @@ def update(dt):
         image.update(dt)
 
 
-@window.event
-def on_key_press(symbol, modifiers):
-    if symbol == pyglet.window.key.T:
-        print("throw gesture performed")
-        thread = Thread(target=receive_data)
-        thread.run()
-    if symbol == pyglet.window.key.Q:
-        sys.exit(0)
 
 
 @window.event
@@ -111,11 +104,19 @@ def on_key_press(symbol, modifiers):
             shift = image.width
     print(shift)
     if symbol == pyglet.window.key.LEFT:
-        if gallery.images[0].x < 0:
-            gallery.move_sprites(-(shift + 100))
+        gallery.on_tilt_left()
+        #if gallery.images[0].x < 0:
+        #    gallery.move_sprites(-(shift + 100))
     elif symbol == pyglet.window.key.RIGHT:
-        if gallery.images[-1].x > 500:
-            gallery.move_sprites(shift + 100)  
+        gallery.on_tilt_right()
+        #if gallery.images[-1].x > 500:
+        #    gallery.move_sprites(shift + 100)
+    elif symbol == pyglet.window.key.T:
+        print("throw gesture performed")
+        thread = Thread(target=receive_data)
+        thread.run()
+    elif symbol == pyglet.window.key.Q:
+        sys.exit(0)
 
 # for predicted gestures
 
@@ -128,15 +129,15 @@ def apply_input(input_condition):
     print(shift)
 
     if input_condition == Gesture.TILT_RIGHT: # tilt left
-        print("tilt left")
+        gallery.on_tilt_right()
         #if gallery.images[0].x < 0:
-        gallery.move_sprites(-(shift + 100))
+        #gallery.move_sprites(-(shift + 100))
     elif input_condition == Gesture.TILT_LEFT: # tilt right
-        print("tilt right")
+        gallery.on_tilt_left()
         #f gallery.images[-1].x > 500:
-        gallery.move_sprites(shift + 100)
+        #gallery.move_sprites(shift + 100)
     elif input_condition == Gesture.THROW: # throw
-        print(receive_data())
+        receive_data()
         #append_picture()
         print("throw")
     elif input_condition == 3: # neutral
@@ -148,6 +149,6 @@ def append_picture():
     print("fwfwf")
 
 
-pyglet.clock.schedule_interval(update, 1/60)
+#pyglet.clock.schedule_interval(update, 1/60)
 
 pyglet.app.run()
