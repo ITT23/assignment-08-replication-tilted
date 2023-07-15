@@ -34,10 +34,12 @@ class AnimatedSprite(pyglet.sprite.Sprite):
 '''
 
 class Gallery:
-    def __init__(self, window_w, window_h):
+    def __init__(self, window_w, window_h, folder):
         self.window_w = window_w
         self.window_h = window_h
         self.images = []
+        self.image_paths = []
+        self.folder_path = folder
         self.current_img_index = 0
         self.moving_left_active = False
         self.moving_right_active = False
@@ -60,14 +62,48 @@ class Gallery:
             scaled_img_width = scaling_factor * img.width
             sprite.x = (i + 1) * (scaled_img_width + 25)
             self.images.append(sprite)
+            self.image_paths.append(filename)
         self.images[self.current_img_index].opacity = self.max_opacity
 
     def draw(self):
+        self.check_and_add_new_img()
         movement_active, moving_direction = self.update_movement()
         for i, image in enumerate(self.images):
             if movement_active:
                 image.x += moving_direction * 5
             image.draw()
+
+    def check_and_add_new_img(self):
+        img_folder = os.path.join(os.path.dirname(__file__), "img")
+        img_files = os.listdir(img_folder)
+        if len(img_files) > len(self.images):
+            print("new img found")
+
+        new_filenames = []
+        for filename in img_files:
+            if filename not in self.image_paths:
+                new_filenames.append(filename)
+
+        for new_filename in new_filenames:
+            img = pyglet.image.load(f'{self.folder_path}/{new_filename}')
+            img.anchor_x = img.width // 2
+            img.anchor_y = img.height // 2
+
+            sprite = pyglet.sprite.Sprite(img, x=self.window_w // 2, y=self.window_h // 2)
+            scaling_factor = self.get_scale_factor(img.width, img.height)
+            sprite.scale = scaling_factor
+            sprite.opacity = self.min_opacity
+            scaled_img_width = scaling_factor * img.width
+            for i, image in enumerate(self.images):
+                # todo: fix placing
+                if i < self.current_img_index:
+                    image.x -= (scaled_img_width + 25)
+                else:
+                    image.x += (scaled_img_width + 25)
+                image.opacity = self.min_opacity
+            self.images.insert(self.current_img_index, sprite)
+            self.image_paths.insert(self.current_img_index, new_filename)
+            self.images[self.current_img_index].opacity = self.max_opacity
 
     def update_movement(self):
         movement_active = False
@@ -108,33 +144,10 @@ class Gallery:
         if (not self.moving_left_active and not self.moving_right_active) and self.current_img_index > 0:
             self.current_img_index -= 1
             self.moving_right_active = True
-    
-    def add_image(self, path):
-        img = pyglet.image.load(path)
-        img.anchor_x = img.width // 2
-        img.anchor_y = img.height // 2
-
-        sprite = pyglet.sprite.Sprite(img, x=self.window_w/2, y=self.window_h/2)
-        scaling_factor = self.get_scale_factor(img.width, img.height)
-        sprite.scale = scaling_factor
-        sprite.opacity = self.min_opacity
-        #scaled_img_width = scaling_factor * img.width
-        #sprite.x = (i + 1) * (scaled_img_width + 25)
-        #sprite = pyglet.sprite.Sprite(img=img, x=0, y=0)
-        scaled_img_width = scaling_factor * img.width
-        #sprite.x = (i + 1) * (scaled_img_width + 25)
-        for i, image in enumerate(self.images):
-            if i < self.current_img_index:
-                image.x -= (scaled_img_width + 25)
-            else:
-                image.x += (scaled_img_width + 25)
-            image.opacity = self.min_opacity
-        self.images.insert(self.current_img_index, sprite)
-        self.images[self.current_img_index].opacity = self.max_opacity
-
 
     def get_scale_factor(self, sprite_width, sprite_height):
         x_scale = self.max_img_width / sprite_width
         # y_scale = self.window_h / sprite_height
         return x_scale
+
 
