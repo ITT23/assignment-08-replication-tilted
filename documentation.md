@@ -1,7 +1,7 @@
 # Documentation
 
 ## Decision Process
-We discussed a few potential paper for example "The bubble cursor: enhancing target acquisition by dynamic resizing of the cursor's activation area", "Mobile Phones as Pointing Devices" or the papers of our journal club. But the input techniques presented in those were either too easy(for 3 people) or too hard to replicate. After looking over them we discussed the paper... , which we found was a reasonable interaction technique, that can be used in many applications. In the paper they described a few application purposes and presented a gallery view, which we chose to implement ourselfs. We have chosen the image viewer from the paper ... for the following reasons:
+We discussed a few potential paper for example "The bubble cursor: enhancing target acquisition by dynamic resizing of the cursor's activation area", "Mobile Phones as Pointing Devices" or the papers of our journal club. But the input techniques presented in those were either too easy(for 3 people) or too hard to replicate. After looking over them we discussed the paper ["Natural throw and tilt interaction between mobile phones and distant displays"](https://dl.acm.org/doi/abs/10.1145/1520340.1520467?casa_token=tPt_nNSHzxoAAAAA%3AvBnONUcn68lt9nj3HLlBOtkJKcMi-a-HIHsYxd4WW2xYXDjClwjj9KEan7ISVKCcHQQqxwkJwEN6) , which we found was a reasonable interaction technique, that can be used in many applications. In the paper they described a few application purposes and presented a gallery view, which we chose to implement ourselfs. We have chosen the image viewer from the paper for the following reasons:
 
 - for the application you only need a smartphone and no additional hardware
 - nothing too easy or shallow, since we are a group of three
