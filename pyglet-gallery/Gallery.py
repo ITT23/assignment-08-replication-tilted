@@ -46,6 +46,7 @@ class Gallery:
         self.min_opacity = 64
         self.max_opacity = 255
         self.max_img_width = window_w // 3
+        self.moving_v = 10
 
         img_folder = os.path.join(os.path.dirname(__file__), "img")
         img_files = os.listdir(img_folder)
@@ -70,7 +71,7 @@ class Gallery:
         movement_active, moving_direction = self.update_movement()
         for i, image in enumerate(self.images):
             if movement_active:
-                image.x += moving_direction * 5
+                image.x += moving_direction * self.moving_v
             image.draw()
 
     def check_and_add_new_img(self):
@@ -124,7 +125,7 @@ class Gallery:
         # if images are currently moving, check if target img is in center
         # if so: stop movement, if not: update opacity to highlight new target img
         if moving_direction != 0:
-            if self.window_w / 2 - 5 < self.images[self.current_img_index].x < self.window_w / 2 + 5:
+            if self.window_w / 2 - self.moving_v < self.images[self.current_img_index].x < self.window_w / 2 + self.moving_v:
                 movement_active = False
                 self.moving_right_active = False
                 self.moving_left_active = False

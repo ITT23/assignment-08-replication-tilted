@@ -4,14 +4,11 @@ from Gallery import Gallery
 import sys
 import requests
 import base64
-import time
 from threading import Thread
 from DIPPID import SensorUDP
-#sys.path.append("../gesture_recognition/")
 from recogniser import Recogniser
 from collections import deque
 from gestures import Gesture
-import statistics
 
 
 WINDOW_WIDTH = 800
@@ -35,33 +32,24 @@ deque_list = deque([], maxlen=50)
 port = 5700
 sensor = SensorUDP(port)
 recent_predictions = deque([], maxlen=15)
-mode_counter = 0
-
-
 
 
 def handle_sensor_data():
-    global mode_counter
     data = sensor.get_value("accelerometer")
     if data:
         deque_list.append(transform_data(data))
     if len(deque_list) == 50:
         result = recognizer.predict(list(deque_list))
         recent_predictions.append(result)
+        deque_list.clear()
         apply_input(result)
-    if mode_counter == 20:
-        print(recent_predictions)
-        if recent_predictions and len(recent_predictions) > 0:
-            mode = statistics.mode(recent_predictions)
-            apply_input(mode)
-        mode_counter = 0
 
 
 def transform_data(data: dict) -> tuple:
     x = data["x"]
     y = data["y"]
     z = data["z"]
-    return [x,y,z]
+    return [x, y, z]
 
 
 def apply_input(input_condition):
@@ -91,8 +79,6 @@ def receive_data():
 
 @window.event
 def on_draw():
-    global mode_counter
-    mode_counter += 1
     window.clear()
     handle_sensor_data()
     gallery.draw()
@@ -105,7 +91,6 @@ def on_key_press(symbol, modifiers):
     elif symbol == pyglet.window.key.RIGHT:
         gallery.on_tilt_right()
     elif symbol == pyglet.window.key.T:
-        print("throw gesture performed")
         thread = Thread(target=receive_data)
         thread.run()
     elif symbol == pyglet.window.key.Q:
