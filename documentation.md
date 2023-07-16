@@ -18,7 +18,7 @@ we trained an LSTM model on four gestures: TILT_LEFT, TILT_RIGHT, THROW, NEUTRAL
 
 1. first, we generated a lot of accelerometer data with `gather-data.py` with M5Stacks and android smartphones using the DIPPID class. this app makes it easy to generate data: pressing button_1 starts a record, pressing button_1 again stops the record and dumps it in a csv file. this can be repeated for a specific gesture as long as needed. the CLI parameters are documented in the according script file. According to the paper, accelerometer data is sufficient to recognise the correct gestures.
 
-2. mid-project, we realised that the x-axis of M5Stacks and some Android Smartphones are inverted. so we decided to check all the git commits that included data from M5Stacks and multiplied all accelermeter x values by -1. (see `invert.py` in archive)
+2. mid-project, we realised that the x-axis of M5Stacks and some Android Smartphones are inverted. so we decided to check all the git commits that included data from M5Stacks and multiplied all accelermeter x values by -1. (see `invert.py` in archive). we used the command `git diff --name-only f0040395abd9956eb30f8a95f4411987bfe24a48^ f0040395abd9956eb30f8a95f4411987bfe24a48 | grep -E '\.csv$' > f0040395abd9956eb30f8a95f4411987bfe24a48.txt` to get the according files from the commit. all the created files were merged into `all.txt` which can be found in archvie.
 
 3. we trained a lstm model that showed good results after 500 records. in total, we recorded 2608 gestures with M5Stacks and android smartphones. we also included a plot showing the loss and accuracy for each epoch along with a confusion matrix.
 
