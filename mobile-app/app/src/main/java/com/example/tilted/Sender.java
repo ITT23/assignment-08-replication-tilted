@@ -18,12 +18,12 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class Sender extends NanoHTTPD {
 
-    private Context context;
+    private MainActivity context;
     private File currentFile;
 
     public Sender(Context context) {
         super(8080);
-        this.context = context;
+        this.context = (MainActivity) context;
         startWebServer();
     }
 
@@ -63,33 +63,18 @@ public class Sender extends NanoHTTPD {
 
     @Override
     public Response serve(IHTTPSession session) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            Log.e("FILENAME", currentFile.getName());
-            Log.e("FILEPATH", currentFile.getPath());
-            Log.e("ISFILE", currentFile.exists()+"");
-            Log.e("ISIMG", isImage(currentFile)+"");
-
-            // only allow throwing if current file is image (not directory)
-            /** if (currentFile.isDirectory()) {
-                File[] listFiles = currentFile.listFiles();
-                String[] bufferedFiles = new String[listFiles.length];
-                for (int i = 0; i < listFiles.length; i++) {
-                    if (isImage(listFiles[i])) {
-                        String encoded = encodeFile(listFiles[i]);
-                        if (encoded != null) {
-                            bufferedFiles[i] = encoded;
-                        }
-                    }
+        if (context.isImageViewerFragment()) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                // only allow throwing if current file is image (not directory)
+                if (currentFile.exists() && isImage(currentFile)) {
+                    String filename = currentFile.getName();
+                    Log.e("FILENAME", filename);
+                    String filedata = encodeFile(currentFile);
+                    String msg = String.format("{\"filename\" : \"%s\", \"data\" : \"%s\"}", filename, filedata);
+                    return new Response(msg);
                 }
-                return new Response(Arrays.toString(bufferedFiles));
-            } else **/ if (currentFile.exists() && isImage(currentFile)) {
-                String filename = currentFile.getName();
-                Log.e("FILENAME", filename);
-                String filedata = encodeFile(currentFile);
-                String msg = String.format("{\"filename\" : \"%s\", \"data\" : \"%s\"}", filename, filedata);
-                return new Response(msg);
             }
         }
-        return new Response("");
+        return new Response(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "The requested resource is not an image.");
     }
 }

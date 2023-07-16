@@ -13,6 +13,7 @@ import android.text.format.Formatter;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -32,11 +33,6 @@ public class MainActivity extends AppCompatActivity {
     private Sender sender;
     public final String ROOT_PATH = Environment.getExternalStorageDirectory().getPath();
     private File chosenFile;
-
-    // since we have dippid, we recognize the performed gesture at the PC, not on the mobile device
-    // thus, we decided to use a http connection (PC sends GET-request to phone as soon as throw-gesture is recognized)
-    // to do so, we need the phone's IP at the PC
-    // pass the phone's IP as param when starting PC program
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,5 +152,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void setChosenFile(File chosenFile) {
         this.chosenFile = chosenFile;
+    }
+
+    public boolean isImageViewerFragment() {
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.image_viewer_fragment);
+        return (f != null && f.isVisible());
     }
 }

@@ -25,6 +25,7 @@ public class CameraFragment extends Fragment {
     private ActivityResultLauncher<Uri> cameraLauncher;
     private Uri imgUri;
     private MainActivity mainActivity;
+    private String currentTimestampFilename;
 
 
     @Override
@@ -56,7 +57,7 @@ public class CameraFragment extends Fragment {
                 public void onActivityResult(Boolean result) {
                     try {
                         if (result) {
-                            File file = new File(mainActivity.getFilesDir(), "camera_photo.jpg");
+                            File file = new File(mainActivity.getFilesDir(), currentTimestampFilename);
                             mainActivity.setChosenFile(file);
                             mainActivity.getSender().setCurrentFile(file);
                             FragmentManager fragmentManager = mainActivity.getSupportFragmentManager();
@@ -74,7 +75,8 @@ public class CameraFragment extends Fragment {
     }
 
     private Uri createUri() {
-        File imgFile = new File(getActivity().getApplicationContext().getFilesDir(), "camera_photo.jpg");
+        currentTimestampFilename = String.format("{0}.jpg", System.currentTimeMillis());
+        File imgFile = new File(getActivity().getApplicationContext().getFilesDir(), currentTimestampFilename);
         return FileProvider.getUriForFile(
                 getActivity().getApplicationContext(),
                 "com.example.tilted.fileProvider",

@@ -34,7 +34,8 @@ public class ImageViewerFragment extends Fragment {
         imgView = getView().findViewById(R.id.open_img_imageview);
         File file = mainActivity.getChosenFile();
         if(file.exists()){
-            Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+            String path = file.getAbsolutePath();
+            Bitmap myBitmap = BitmapFactory.decodeFile(path);
             imgView.setImageBitmap(myBitmap);
         }
     }
