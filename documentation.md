@@ -12,7 +12,17 @@ We discussed a few potential paper for example "The bubble cursor: enhancing tar
 
 ### Gesture Recognition
 
-We trained an LSTM model on three gestures: TILT, THROW, NEUTRAL. In order to distinguish between right- and left-tilt, we categorize the accelerometer data, after our model predicted a tilt gesture.
+we trained an LSTM model on four gestures: TILT_LEFT, TILT_RIGHT, THROW, NEUTRAL.
+
+1. first, we generated a lot of accelerometer data with `gather-data.py` with M5Stacks and android smartphones using the DIPPID class. this app makes it easy to generate data: pressing button_1 starts a record, pressing button_1 again stops the record and dumps it in a csv file. this can be repeated for a specific gesture as long as needed. the CLI parameters are documented in the according script file. According to the paper, accelerometer data is sufficient to recognise the correct gestures.
+
+2. mid-project, we realised that the x-axis of M5Stacks and some Android Smartphones are inverted. so we decided to check all the git commits that included data from M5Stacks and multiplied all accelermeter x values by -1. (see `invert.py` in archive)
+
+3. we trained a lstm model that showed good results after 500 records. in total, we recorded 2608 gestures with M5Stacks and android smartphones. we also included a plot showing the loss and accuracy for each epoch along with a confusion matrix.
+
+4. we saved the trained model to the folder lstm_model so that we can compile it when needed in `recogniser.py` that is referenced in `gallery_app.py`. we also saved the encoder settings so that we can savely translate the encoding back to the enum names.
+
+5. `test_recogniser.py` (in archive) can be used to test the trained recogniser model with a M5Stack or an android smartphone.
 
 ### Tilted Desktop App - Image Viewer
 
