@@ -1,6 +1,8 @@
 # Documentation
 
-We decided to re-implement ["Natural throw and tilt interaction between mobile phones and distant displays"](https://dl.acm.org/doi/abs/10.1145/1520340.1520467?casa_token=tPt_nNSHzxoAAAAA%3AvBnONUcn68lt9nj3HLlBOtkJKcMi-a-HIHsYxd4WW2xYXDjClwjj9KEan7ISVKCcHQQqxwkJwEN6). Further description is provided below. At the end of this page, there is a short demo video of our application.
+We decided to re-implement ["Natural throw and tilt interaction between mobile phones and distant displays"](https://dl.acm.org/doi/abs/10.1145/1520340.1520467?casa_token=tPt_nNSHzxoAAAAA%3AvBnONUcn68lt9nj3HLlBOtkJKcMi-a-HIHsYxd4WW2xYXDjClwjj9KEan7ISVKCcHQQqxwkJwEN6). Further description is provided below. 
+
+[Watch a short demo video of our application!](../doc_images/Tilted_Demo.mp4)
 
 ## Decision Process
 
@@ -38,7 +40,7 @@ We trained an LSTM model on four gestures: TILT_LEFT, TILT_RIGHT, THROW, NEUTRAL
 
 The desktop application consists of a pyglet window, which displays images of a given folder. You can use the arrow keys on the keyboard to scroll to this image gallery.
 
-![Pyglet Gallery](doc_images/screenshot_application.png)
+![Pyglet Gallery](../doc_images/screenshot_application.png)
 
 In combination with **DIPPID** and **Tilted** (described below), you can also use a mobile device as remote control here. The pyglet app handles different events then:
 
@@ -56,7 +58,7 @@ If you just want to use your smartphone as a remote control to browse through yo
 
 #### Getting Started
 
-1. download [Tilted](tilted.apk) and [DIPPID](https://github.com/PDA-UR/DIPPID-android) and install them on your mobile device
+1. download [Tilted](../tilted.apk) and [DIPPID](https://github.com/PDA-UR/DIPPID-android) and install them on your mobile device
 2. start **DIPPID**, enter your PC's IP and toggle send data so that it is active
 3. start **Tilted**, make sure **DIPPID** is still running in the background
 4. start `gallery_app.py` and pass the IP displayed in your **Tilted** app as command line parameter
@@ -68,7 +70,7 @@ The mobile app consists of two sections which can be switched by a tab menu. One
 
 |                     explorer view                      |                    take-a-photo view                     |                   ready-to-throw view                    |
 | :----------------------------------------------------: | :------------------------------------------------------: | :------------------------------------------------------: |
-| ![Explorer View Image](doc_images/mobile_explorer.png) | ![Take A Photo View Image](doc_images/mobile_camera.png) | ![Ready 2 Throw View Image](doc_images/mobile_throw.png) |
+| ![Explorer View Image](../doc_images/mobile_explorer.png) | ![Take A Photo View Image](../doc_images/mobile_camera.png) | ![Ready 2 Throw View Image](../doc_images/mobile_throw.png) |
 
 In the **explorer view**, you can chose an image out of your files. If you click its filename, it will be displayed in the **ready-to-throw view**. By performing a _throw_ gesture, the file will be transferred to and displayed at your other device.
 
@@ -83,7 +85,3 @@ Since we have **DIPPID**, we used the existing workflow for sending sensor data 
 To this end, we implemented a HTTP server on the mobile device using [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd) which receives GET-requests as soon as a _throw_ gesture is recognized. The smartphone responds with the currently displayed image within **Tilted** encoded as `base64`.
 
 To establish a connection between mobile device and PC, the smartphone's IP is served as command line parameter to the image gallery. No worries, there is no need for the user to discover their smartphone's IP by themselves: It is displayed in **Tilted**.
-
-# Demo
-
-![Demo Video of Tilted](doc_images/Tilted_Demo.mp4)
