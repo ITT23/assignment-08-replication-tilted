@@ -25,7 +25,7 @@ class Application:
     self._dippid_port = dippid_port
     self._phone_ip = phone_ip
     self._phone_port = phone_port
-    self._img_folder = img_folder
+    self.img_folder = img_folder
 
     self.window = window.Window(self.WINDOW_WIDTH, self.WINDOW_HEIGHT, caption=self.NAME)
     self.on_draw = self.window.event(self.on_draw)
@@ -33,12 +33,12 @@ class Application:
     
     self.sensor = SensorUDP(self._dippid_port)
     self.recognizer = Recogniser()
-    self.gallery = Gallery(self.window.width, self.window.height, img_folder)
+    self.gallery = Gallery(self.window.width, self.window.height, self.img_folder)
     
     self.deque_list = deque([], maxlen=self.DEQUE_LENGTH)
 
     #queue is thread safe and lets you pass e.g. a function to the second thread
-    self.queue = queue.Queue()
+    self.worker_queue = queue.Queue()
     self.thread = Thread(target=self.worker, daemon=True).start()
 
   def worker(self):
@@ -46,8 +46,8 @@ class Application:
       second thread is always running so that we do not have to create a new thread each time we want to send a picture from smartphone to the gallery_app. we pass the receive_app function to the thread safe queue and wait in the second thread until the queue is not empty, then request the image data.
     '''
     while True:
-      if not self.queue.empty():
-        get_image_func = self.queue.get()
+      if not self.worker_queue.empty():
+        get_image_func = self.worker_queue.get()
         get_image_func()
       
       time.sleep(0.1)
@@ -79,7 +79,7 @@ class Application:
     
     elif input_condition == Gesture.THROW:
       #put receive_data function into queue when user wants to send a picture from his smartphone
-      self.queue.put(self.receive_data)
+      self.worker_queue.put(self.receive_data)
 
   def receive_data(self, *_) -> None:
     try:
@@ -106,7 +106,7 @@ class Application:
       self.gallery.tilt_right()
     
     elif symbol == window.key.T:
-      self.queue.put(self.receive_data)
+      self.worker_queue.put(self.receive_data)
     
     elif symbol == window.key.Q:
       #second thread dies with the main thread when adding the parameter daemon=True
@@ -120,7 +120,7 @@ if __name__ == "__main__":
   parser.add_argument("-p", default=5700, type=int, help="dippid port")
   parser.add_argument("-pi", default="192.168.2.116", type=str, help="phone ip")
   parser.add_argument("-pp", default=8080, type=int, help="phone port")
-  parser.add_argument("-f", default="/Users/micha/Projects/ITT/08_assignment/pyglet_gallery/img", type=str, help="add absolute path to a folder with preexisiting images")
+  parser.add_argument("-f", default="pyglet_gallery/img", type=str, help="add absolute path to a folder with preexisiting images")
 
   args = parser.parse_args()
 
