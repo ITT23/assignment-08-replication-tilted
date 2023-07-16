@@ -1,7 +1,8 @@
-import os, sys, base64
+import os, sys, base64, time
 from argparse import ArgumentParser
 from collections import deque
 from threading import Thread
+import queue
 
 import requests
 from pyglet import app, window
@@ -36,6 +37,21 @@ class Application:
     
     self.deque_list = deque([], maxlen=self.DEQUE_LENGTH)
 
+    #queue is thread safe and lets you pass e.g. a function to the second thread
+    self.queue = queue.Queue()
+    self.thread = Thread(target=self.worker, daemon=True).start()
+
+  def worker(self):
+    '''
+      second thread is always running so that we do not have to create a new thread each time we want to send a picture from smartphone to the gallery_app. we pass the receive_app function to the thread safe queue and wait in the second thread until the queue is not empty, then request the image data.
+    '''
+    while True:
+      if not self.queue.empty():
+        get_image_func = self.queue.get()
+        get_image_func()
+      
+      time.sleep(0.1)
+
   def handle_sensor_data(self) -> None:
     data = self.sensor.get_value(self.SENSOR_KEY)
     
@@ -62,9 +78,8 @@ class Application:
       self.gallery.tilt_left()
     
     elif input_condition == Gesture.THROW:
-      thread = Thread(target=self.receive_data, daemon=True)
-      thread.start()
-      thread.join()
+      #put receive_data function into queue when user wants to send a picture from his smartphone
+      self.queue.put(self.receive_data)
 
   def receive_data(self, *_) -> None:
     try:
@@ -74,7 +89,7 @@ class Application:
       filedata = result['data']
       with open(os.path.normpath(os.path.join(self.img_folder, filename)), "wb") as fh:
         fh.write(base64.b64decode(filedata))
-    
+
     except:
       pass
 
@@ -91,11 +106,10 @@ class Application:
       self.gallery.tilt_right()
     
     elif symbol == window.key.T:
-      thread = Thread(target=self.receive_data, daemon=True)
-      thread.start()
-      thread.join()
+      self.queue.put(self.receive_data)
     
     elif symbol == window.key.Q:
+      #second thread dies with the main thread when adding the parameter daemon=True
       sys.exit(0)
 
   def run(self) -> None:
