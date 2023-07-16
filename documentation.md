@@ -1,29 +1,73 @@
 # Documentation
 
 ## Decision Process
+
 We discussed a few potential paper for example "The bubble cursor: enhancing target acquisition by dynamic resizing of the cursor's activation area", "Mobile Phones as Pointing Devices" or the papers of our journal club. But the input techniques presented in those were either too easy(for 3 people) or too hard to replicate. After looking over them we discussed the paper ["Natural throw and tilt interaction between mobile phones and distant displays"](https://dl.acm.org/doi/abs/10.1145/1520340.1520467?casa_token=tPt_nNSHzxoAAAAA%3AvBnONUcn68lt9nj3HLlBOtkJKcMi-a-HIHsYxd4WW2xYXDjClwjj9KEan7ISVKCcHQQqxwkJwEN6) , which we found was a reasonable interaction technique, that can be used in many applications. In the paper they described a few application purposes and presented a gallery view, which we chose to implement ourselfs. We have chosen the image viewer from the paper for the following reasons:
 
 - for the application you only need a smartphone and no additional hardware
 - nothing too easy or shallow, since we are a group of three
 - in the image viewer you can switch images with tilt gestures and add new images by a throwing gesture, which can be extended to work in more than this application (e.g. powerpoint)
 
-## Implementation
+## Components and Implementation
 
 ### Gesture Recognition
-We trained an LSTM model on three gestures: TILT, THROW, NEUTRAL. In order to distinguish between right- and left-tilt, we categorize the accelerometer data, after our model predicted a tilt gesture. 
 
-### Desktop Image Viewer
-The desktop application consists of a pyglet window, in which selected images of the user are displayed. The pyglet app handles different events, that are received from the smartphone. When the model predicts a left tilt, the image viewer shows the previous displayed image. When a right tilt is detected, the next picture is shown (in focus). When a throw gesture is detected, an images taken with the corresponding mobile app is added to the image viewer.
+We trained an LSTM model on three gestures: TILT, THROW, NEUTRAL. In order to distinguish between right- and left-tilt, we categorize the accelerometer data, after our model predicted a tilt gesture.
 
-### mobile app
-The mobile app consists of two sections. one section for selecting a image nfolder and another section for making a new phoo and adding it to the current image gallery.
+### Tilted Desktop App - Image Viewer
 
+#### Getting Started
 
-### usage
+0. make sure there is a folder called `lstm_model` in the same directory as `pyglet-gallery.py`. Otherwiese run `gesture_recognition/model.ipynb` first.
+1. run `python pyglet-gallery.py [smartphone IP] [path to image folder]`
+   Command line parameters are optional and have default values. But for remote control, make sure the smartphone IP is corrent.
 
-- download the apk and enter the ip of your pc/laptop
-- choose a folder you want to have displayed on your other device
-- if images are shown on other device, you can tilt your phone left or right, to scroll through your images
-- if you want to add a new image to your gallery, you can take a picture with the app and send it to your device
-- the new picture is displayed at the position of the current image
-(Video)
+#### Description
+
+The desktop application consists of a pyglet window, which displays images of a given folder. You can use the arrow keys on the keyboard to scroll to this image gallery.
+
+**TODO: GIF einfügen**
+
+In combination with **DIPPID** and **Tilted** (described below), you can also use a mobile device as remote control here. The pyglet app handles different events then:
+
+- TILT LEFT: the image viewer shows the previous displayed image.
+- TILT RIGHT: the next picture is shown.
+- THROW: an image chosen by **Tilted** mobile app is added and focused.
+
+#### Implementation
+
+For classifying performed gestures with the mobile device, the desktop app uses a pre-trained LSTM (described above). The prediction is based on accelerometer sonsor data which are sent via **DIPPID** from mobile device to PC. Incoming accelerometer data is stored in a deque. As soon as we have enough values, the program initiates a prediction. Based on the prediction, the pyglet app replaces the images or sends a GET-request to receive an image from **Tilted** mobile app.
+
+### Tilted Mobile App - Image Selection
+
+If you just want to use your smartphone as a remote control to browse through your image gallery, it is sufficient to install only the **DIPPID** app. But if you also want to transfer an image from your smartphone to a larger screen, you will additionally need the **Tilted** app.
+
+#### Getting Started
+
+1. download [Tilted]() and [DIPPID]() and install them on your mobile device
+2. start **DIPPID**, enter your PC's IP and toggle send data so that it is active
+3. start **Tilted**, make sure **DIPPID** is still running in the background
+4. start pyglet-gallery.py and pass the IP displayed in your **Tilted** app as command line parameter
+5. use **Tilted** as described in the following
+
+#### Description
+
+The mobile app consists of two sections which can be switched by a tab menu. One section for selecting an image and another section for taking a new photo to add it to the current image gallery at the larger screen.
+
+|                explorer view                |               take-a-photo view               |              ready-to-throw view              |
+| :-----------------------------------------: | :-------------------------------------------: | :-------------------------------------------: |
+| ![Explorer View Image](mobile_explorer.png) | ![Take A Photo View Image](mobile_camera.png) | ![Ready 2 Throw View Image](mobile_throw.png) |
+
+In the **explorer view**, you can chose an image out of your files. If you click its filename, it will be displayed in the **ready-to-throw view**. By performing a _throw_ gesture, the file will be transferred to and displayed at your other device.
+
+When clicking the button in the **take-a-photo view**, the camera opens up and you can take a picture in landscape mode. Once you have done this, the newly captured image shows up in the **ready-to-throw view**. Now, you can transfer the photo with a _throwing_ gesture.
+
+#### Implementation
+
+We implemented the mobile app in Java. It offers a GUI to chose an image file out of a file explorer as well as the option to take a new photo.
+
+Since we have **DIPPID**, we used the existing workflow for sending sensor data to the PC. For this reason, and because of the simpler use `python`, we recognize performed gestures on the PC, not on the mobile device. Therefore, the PC has to notify the mobile device when the user performs a _throwing_ gesture.
+
+To this end, we implemented a HTTP server on the mobile device using [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd) which receives GET-requests as soon as a _throw_ gesture is recognized. The smartphone responds with the currently displayed image within **Tilted** encoded as `base64`.
+
+To establish a connection between mobile device and PC, the smartphone's IP is served as command line parameter to the image gallery. No worries, there is no need for the user to discover their smartphone's IP by themselves: It is displayed in **Tilted**.
