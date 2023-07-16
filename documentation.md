@@ -38,7 +38,7 @@ We trained an LSTM model on four gestures: TILT_LEFT, TILT_RIGHT, THROW, NEUTRAL
 
 The desktop application consists of a pyglet window, which displays images of a given folder. You can use the arrow keys on the keyboard to scroll to this image gallery.
 
-![Pyglet Gallery](doc_images/screenshot_application.png)
+![Pyglet Gallery](../doc_images/screenshot_application.png)
 
 In combination with **DIPPID** and **Tilted** (described below), you can also use a mobile device as remote control here. The pyglet app handles different events then:
 
@@ -56,7 +56,7 @@ If you just want to use your smartphone as a remote control to browse through yo
 
 #### Getting Started
 
-1. download [Tilted](tilted.apk) and [DIPPID](https://github.com/PDA-UR/DIPPID-android) and install them on your mobile device
+1. download [Tilted](../tilted.apk) and [DIPPID](https://github.com/PDA-UR/DIPPID-android) and install them on your mobile device
 2. start **DIPPID**, enter your PC's IP and toggle send data so that it is active
 3. start **Tilted**, make sure **DIPPID** is still running in the background
 4. start `gallery_app.py` and pass the IP displayed in your **Tilted** app as command line parameter
@@ -68,7 +68,7 @@ The mobile app consists of two sections which can be switched by a tab menu. One
 
 |                     explorer view                      |                    take-a-photo view                     |                   ready-to-throw view                    |
 | :----------------------------------------------------: | :------------------------------------------------------: | :------------------------------------------------------: |
-| ![Explorer View Image](doc_images/mobile_explorer.png) | ![Take A Photo View Image](doc_images/mobile_camera.png) | ![Ready 2 Throw View Image](doc_images/mobile_throw.png) |
+| ![Explorer View Image](../doc_images/mobile_explorer.png) | ![Take A Photo View Image](../doc_images/mobile_camera.png) | ![Ready 2 Throw View Image](../doc_images/mobile_throw.png) |
 
 In the **explorer view**, you can chose an image out of your files. If you click its filename, it will be displayed in the **ready-to-throw view**. By performing a _throw_ gesture, the file will be transferred to and displayed at your other device.
 
@@ -86,4 +86,4 @@ To establish a connection between mobile device and PC, the smartphone's IP is s
 
 # Demo
 
-![Demo Video of Tilted](doc_images/Tilted_Demo.mp4)
+![Demo Video of Tilted](../doc_images/Tilted_Demo.mp4)
