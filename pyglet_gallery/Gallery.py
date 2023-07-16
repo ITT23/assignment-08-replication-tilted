@@ -3,12 +3,13 @@ import pyglet
 
 
 class Gallery:
-    def __init__(self, window_w, window_h, folder):
+
+    def __init__(self, window_w: int, window_h: int, img_folder: str) -> None:
+        self.img_folder = self._check_image_path(img_folder)
         self.window_w = window_w
         self.window_h = window_h
         self.images = []
         self.image_paths = []
-        self.folder_path = folder
         self.current_img_index = 0
         self.moving_left_active = False
         self.moving_right_active = False
@@ -18,17 +19,22 @@ class Gallery:
         self.spacing_between = 25
         self.moving_v = 7
 
-        img_folder = os.path.join(os.path.dirname(__file__), self.folder_path)
-        img_files = os.listdir(img_folder)
+        img_files = os.listdir(self.img_folder)
 
         for i, filename in enumerate(img_files):
-            sprite = self.load_sprite(i, img_folder, filename, True)
+            sprite = self.load_sprite(i, filename, True)
             self.images.append(sprite)
             self.image_paths.append(filename)
         self.images[self.current_img_index].opacity = self.max_opacity
 
-    def load_sprite(self, index, img_folder, filename, initial_load):
-        img_path = os.path.join(img_folder, filename)
+    def _check_image_path(self, img_folder: str) -> str:
+      if not os.path.exists(img_folder) and not os.path.isdir(img_folder):
+        raise Exception("img folder path does not exist or is not a directory")
+      
+      return img_folder
+
+    def load_sprite(self, index, filename, initial_load):
+        img_path = os.path.join(self.img_folder, filename)
         img = pyglet.image.load(img_path)
         img.anchor_x = img.width // 2
         img.anchor_y = img.height // 2
@@ -59,8 +65,7 @@ class Gallery:
             image.draw()
 
     def check_and_add_new_img(self):
-        img_folder = os.path.join(os.path.dirname(__file__), self.folder_path)
-        img_files = os.listdir(img_folder)
+        img_files = os.listdir(self.img_folder)
         if len(img_files) > len(self.images):
             # find new files
             new_filenames = []
@@ -71,7 +76,7 @@ class Gallery:
             # display new files in gallery
             for new_filename in new_filenames:
                 try:
-                    sprite = self.load_sprite(-1, self.folder_path, new_filename, False)
+                    sprite = self.load_sprite(-1, new_filename, False)
                     self.images.insert(self.current_img_index, sprite)
                     self.image_paths.insert(self.current_img_index, new_filename)
                     self.images[self.current_img_index].opacity = self.max_opacity
@@ -108,12 +113,12 @@ class Gallery:
                     self.images[self.current_img_index].opacity += 2
         return movement_active, moving_direction
 
-    def on_tilt_left(self):
+    def tilt_left(self):
         if (not self.moving_right_active and not self.moving_left_active) and self.current_img_index < len(self.images) - 1:
             self.current_img_index += 1
             self.moving_left_active = True
 
-    def on_tilt_right(self):
+    def tilt_right(self):
         if (not self.moving_left_active and not self.moving_right_active) and self.current_img_index > 0:
             self.current_img_index -= 1
             self.moving_right_active = True

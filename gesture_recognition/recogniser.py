@@ -5,9 +5,9 @@ from keras.models import load_model
 from numpy.typing import NDArray
 from sklearn.preprocessing import StandardScaler
 from scipy.signal import resample
-from joblib import load
+import joblib
 
-from gestures import Gesture
+from gesture_recognition.gestures import Gesture
 
 class Recogniser:
 
@@ -17,10 +17,9 @@ class Recogniser:
 
   def __init__(self) -> None:
     print("* * * loading lstm model * * *")
-    path = os.path.join(self.CURR_DIR, self.MODEL_PATH)
-    self._model = load_model(path, compile=True)
+    self._model = load_model(os.path.join(self.CURR_DIR, self.MODEL_PATH), compile=True)
     self._scaler = StandardScaler()
-    self._encoder = load('encoder.joblib')
+    self._encoder = joblib.load(os.path.join(self.CURR_DIR, 'encoder.joblib'))
     print("* * * finished loading lstm model * * *")
 
   def predict(self, data: NDArray) -> Gesture:
