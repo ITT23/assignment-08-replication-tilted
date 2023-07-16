@@ -30,9 +30,8 @@ we trained an LSTM model on four gestures: TILT_LEFT, TILT_RIGHT, THROW, NEUTRAL
 
 #### Getting Started
 
-0. make sure there is a folder called `lstm_model` in the same directory as `pyglet-gallery.py`. Otherwiese run `gesture_recognition/model.ipynb` first.
-1. run `python pyglet-gallery.py [smartphone IP] [path to image folder]`
-   Command line parameters are optional and have default values. But for remote control, make sure the smartphone IP is corrent.
+1. run `python pyglet-gallery.py -p [dippid port] -pi [smartphone IP] -pi [smartphone port] -f [path to image folder]`
+   Command line parameters are optional and have default values. But for remote control, make sure the smartphone IP is correct.
 
 #### Description
 
