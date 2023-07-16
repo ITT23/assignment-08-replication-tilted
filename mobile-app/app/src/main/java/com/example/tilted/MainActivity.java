@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.tilted.databinding.ActivityMainBinding;
 import com.google.android.material.tabs.TabLayout;
 
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isImageViewerFragment() {
-        Fragment f = getSupportFragmentManager().findFragmentById(R.id.image_viewer_fragment);
+        Fragment f = getSupportFragmentManager().findFragmentByTag("IMG_VIEW_TAG");
         return (f != null && f.isVisible());
     }
 }

@@ -68,7 +68,6 @@ public class Sender extends NanoHTTPD {
                 // only allow throwing if current file is image (not directory)
                 if (currentFile.exists() && isImage(currentFile)) {
                     String filename = currentFile.getName();
-                    Log.e("FILENAME", filename);
                     String filedata = encodeFile(currentFile);
                     String msg = String.format("{\"filename\" : \"%s\", \"data\" : \"%s\"}", filename, filedata);
                     return new Response(msg);

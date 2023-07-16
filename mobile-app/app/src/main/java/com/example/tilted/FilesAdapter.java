@@ -58,7 +58,7 @@ public class FilesAdapter extends RecyclerView.Adapter<FilesAdapter.ViewHolder>{
                         mainActivity.getSender().setCurrentFile(selectedFile);
                         FragmentManager fragmentManager = fragment.getActivity().getSupportFragmentManager();
                         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.replace(R.id.fragment_container, new ImageViewerFragment());
+                        fragmentTransaction.replace(R.id.fragment_container, new ImageViewerFragment(), "IMG_VIEW_TAG");
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.commit();
                     }

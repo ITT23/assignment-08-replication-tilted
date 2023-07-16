@@ -62,7 +62,7 @@ public class CameraFragment extends Fragment {
                             mainActivity.getSender().setCurrentFile(file);
                             FragmentManager fragmentManager = mainActivity.getSupportFragmentManager();
                             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                            fragmentTransaction.replace(R.id.fragment_container, new ImageViewerFragment());
+                            fragmentTransaction.replace(R.id.fragment_container, new ImageViewerFragment(), "IMG_VIEW_TAG");
                             fragmentTransaction.addToBackStack(null);
                             fragmentTransaction.commit();
                         }
