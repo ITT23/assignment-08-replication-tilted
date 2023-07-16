@@ -30,7 +30,7 @@ we trained an LSTM model on four gestures: TILT_LEFT, TILT_RIGHT, THROW, NEUTRAL
 
 #### Getting Started
 
-1. run `python pyglet-gallery.py -p [dippid port] -pi [smartphone IP] -pi [smartphone port] -f [path to image folder]`
+1. run `python gallery_app.py -p [dippid port] -pi [smartphone IP] -pi [smartphone port] -f [path to image folder]`
    Command line parameters are optional and have default values. But for remote control, make sure the smartphone IP is correct.
 
 #### Description
