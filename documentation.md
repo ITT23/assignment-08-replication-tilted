@@ -1,6 +1,8 @@
 # Documentation
 
-We decided to re-implement ["Natural throw and tilt interaction between mobile phones and distant displays"](https://dl.acm.org/doi/abs/10.1145/1520340.1520467?casa_token=tPt_nNSHzxoAAAAA%3AvBnONUcn68lt9nj3HLlBOtkJKcMi-a-HIHsYxd4WW2xYXDjClwjj9KEan7ISVKCcHQQqxwkJwEN6). Further description is provided below. At the end of this page, there is a short demo video of our application.
+We decided to re-implement ["Natural throw and tilt interaction between mobile phones and distant displays"](https://dl.acm.org/doi/abs/10.1145/1520340.1520467?casa_token=tPt_nNSHzxoAAAAA%3AvBnONUcn68lt9nj3HLlBOtkJKcMi-a-HIHsYxd4WW2xYXDjClwjj9KEan7ISVKCcHQQqxwkJwEN6). Further description is provided below. 
+
+[Watch a short demo video of our application!](../doc_images/Tilted_Demo.mp4)
 
 ## Decision Process
 
@@ -83,7 +85,3 @@ Since we have **DIPPID**, we used the existing workflow for sending sensor data 
 To this end, we implemented a HTTP server on the mobile device using [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd) which receives GET-requests as soon as a _throw_ gesture is recognized. The smartphone responds with the currently displayed image within **Tilted** encoded as `base64`.
 
 To establish a connection between mobile device and PC, the smartphone's IP is served as command line parameter to the image gallery. No worries, there is no need for the user to discover their smartphone's IP by themselves: It is displayed in **Tilted**.
-
-# Demo
-
-![Demo Video of Tilted](../doc_images/Tilted_Demo.mp4)
